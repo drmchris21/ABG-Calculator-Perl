@@ -1,0 +1,160 @@
+#!/usr/bin/perl
+#
+# (C) 2020 Manolis Christodoulou
+# Arterial Blood Gas Acid/Base Analyser
+#
+#	This file is part of retest.
+#
+#	 retest is free software: you can redistribute it and/or modify
+#	 it under the terms of the GNU General Public License as published by
+#	 the Free Software Foundation, either version 3 of the License, or
+#	 (at your option) any later version.
+#
+#	 retest is distributed in the hope that it will be useful,
+#	 but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	 GNU General Public License for more details.
+#
+#	 You should have received a copy of the GNU General Public License
+#	 along with it.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+@r=("Normal\n",
+	"Compensated Metabolic Acidosis\n",
+	"Uncompensated Metabolic Acidosis\n",
+	"Metabolic Acidosis and Respiratory Alcalosis\n",
+	"Acute Respiratory Acidosis over Chronic Respiratory Acidosis\n",
+	"Uncompensated Acute Respiratory Acidosis\n",
+	"Compensated Chronic Respiratory Acidosis\n",
+	"Metabolic Acidosis with Anion Gap\n",
+	"Metabolic Acidosis with Anion Gap and Acidosis without Anion Gap\n",
+	"Metabolic Acidosis with Anion Gap and Metabolic Acidosis\n",
+	"Compensated Metabolic Acidosis\n",
+	"Metabolic Alcalosis and Respiratory Acidosis\n",
+	"Metabolic Alcalosis and Respiratory Alcalosis\n",
+	"Partially Compensated Respiratory Alcalosis\n",
+	"Compensated Chronic Respiratory Alcalosis\n",
+	"Uncompensated Acute Respiratory Alcalosis\n",
+	"Partially Compensated Respiratory Acidosis\n",
+	"Partially Compensated Metabolic Acidosis\n",
+	"Partially Compensated Metabolic Alcalosis\n",
+	"Uncompensated Metabolic Alcalosis\n",
+	"Normal OR Compensated Respiratory Acidosis OR Compensated Metabolic Alcalosis\n",
+	"Normal OR Compensated Respiratory Alcalosis OR Compensated Metabolic Acidosis\n");
+
+print "\nABG Analyser\n(C) 2020 Manolis Christodoulou\n\n";
+
+print "Ph="; $Ph=<>;
+print "pCO2="; $pCO2=<>;
+print "HCO3="; $HCO3=<>;
+print "Na="; $Na=<>;
+print "Cl="; $Cl=<>;
+
+$G=$Na-$Cl-$HCO3;
+@I=();
+($Ph<7 || $Ph>=7.7) && (print "Is it alive?\n") && exit(); 
+
+if ($Ph<7.35 && $HCO3>26) {acid1();}
+if ($Ph<7.35 && $HCO3<=26 && $HCO3>=22) {acid2();}
+if ($Ph<7.35 && $HCO3<22 && $pCO2>60) {acid3();}
+if ($Ph<7.35 && $HCO3<22 && $pCO2<47) {acid4();}
+if ($Ph<7.35 && $HCO3<22 && $pCO2<=60 && $pCO2>=47) {acid5()};
+if ($Ph>=7.35 && $Ph<=7.45 && $HCO3>26) {print $r[20];}
+elsif ($Ph>=7.35 && $Ph<=7.45 && $HCO3<=22) {print $r[21];}
+elsif ($Ph>=7.35 && $Ph<=7.45 && $HCO3>22 && $HCO3<=26) {print $r[0];}
+if ($Ph>=7.45 && $HCO3>26 && $pCo2>60) {alc3();}
+if ($Ph>=7.45 && $HCO3<22) {alc1();}
+if ($Ph>=7.45 && $HCO3<=26 && $HCO3>=22) {alc2();}
+if ($Ph>=7.45 && $HCO3>26 && $pCO2<47) {alc4();}
+if ($Ph>=7.45 && $HCO3>26 && $pCO2>=47) {alc5();}
+
+sub acid1() {
+	print $r[16];
+	A_resacidosis();
+}
+
+sub acid2() {
+	print $r[5];
+	A_resacidosis();
+}
+
+sub acid3() {
+	print $r[11];
+	A_resacidosis();
+}
+
+sub acid4() {
+	print $r[17];
+	A_metacidosis();
+}
+
+sub acid5() {
+	print $r[2];
+	A_metacidosis();
+}
+
+sub A_metacidosis() {
+	my $x=1.5*$HCO3+8-$pCO2;
+	if ($x<=-0.5) {print $r[2];}
+	elsif ($x>=0.5) {print $r[12];}
+	else {print $r[1];}
+	agap();
+}
+
+sub A_resacidosis() {
+	my $y=$pCO2;
+	($y==40) && ($y=40.01);
+	my $x=(10**(9-$Ph)-10**1.6)/($y-40);
+	if ($x>0.8) {print $r[4];}
+	elsif ($x<0.3) {print $r[6];}
+	else {print $r[5];}
+}
+
+sub agap() {
+	my $y=$HCO3;
+	($y==24) && ($y=24.01);
+	if ($G<16) {return;}
+	$x=($G-12)/(24-$y);
+	if ($x<1) {print $r[8];}
+	elsif ($x>2) {print $r[9];}
+	else {print $r[7];}
+}
+
+sub alc1() {
+	print $r[13];
+	A_resalcalosis();
+}
+
+sub alc2() {
+	print $r[15];
+	A_resalcalosis();
+}
+
+sub alc3() {
+	print $r[18];
+	A_metalcalosis();
+}
+
+sub alc4() {
+	print $r[3];
+	A_resalcalosis();
+}
+
+sub alc5() {
+	print $r[19];
+	A_metalcalosis();
+}
+
+sub A_resalcalosis() {
+	$x=($Ph-7.4)/(40-$pCO2);
+	if ($x<0.0017) {print $r[14];}
+	elsif ($x>=0.008) {print $r[15];}
+	else {print $r[13];}
+}
+
+sub A_metalcalosis() {
+	$x=0.7*$HCO3+21-$pCO2;
+	if ($x<-5) {print $r[11];}
+	elsif ($x>5) {print $r[12];}
+	else {print $r[10];}
+}
