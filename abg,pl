@@ -47,8 +47,11 @@ print "pCO2="; $pCO2=<>;
 print "HCO3="; $HCO3=<>;
 print "Na="; $Na=<>;
 print "Cl="; $Cl=<>;
+print "Albumine="; $Alb=<>;
 
 $G=$Na-$Cl-$HCO3;
+($Alb<3.5) && $G+=2.5*(4.5-Alb);
+
 @I=();
 ($Ph<7 || $Ph>=7.7) && (print "Is it alive?\n") && exit(); 
 
@@ -91,14 +94,6 @@ sub acid5() {
 	A_metacidosis();
 }
 
-sub A_metacidosis() {
-	my $x=1.5*$HCO3+8-$pCO2;
-	if ($x<=-0.5) {print $r[2];}
-	elsif ($x>=0.5) {print $r[12];}
-	else {print $r[1];}
-	agap();
-}
-
 sub A_resacidosis() {
 	my $y=$pCO2;
 	($y==40) && ($y=40.01);
@@ -108,8 +103,12 @@ sub A_resacidosis() {
 	else {print $r[5];}
 }
 
-sub agap() {
+sub A_metacidosis() {
 	my $y=$HCO3;
+	my $x=1.5*$y+8-$pCO2;
+	if ($x<=-0.5) {print $r[2];}
+	elsif ($x>=0.5) {print $r[12];}
+	else {print $r[1];}
 	($y==24) && ($y=24.01);
 	if ($G<16) {return;}
 	$x=($G-12)/(24-$y);
