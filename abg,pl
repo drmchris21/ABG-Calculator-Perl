@@ -98,7 +98,7 @@ sub A_resacidosis() {
 	my $y=$pCO2;
 	($y==40) && ($y=40.01);
 	my $x=(10**(9-$Ph)-10**1.6)/($y-40);
-	if ($x>0.8) {print $r[4];}
+	if ($x>0.8) {print $r[5];}
 	elsif ($x<0.3) {print $r[6];}
 	else {print $r[5];}
 }
