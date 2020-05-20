@@ -27,8 +27,8 @@
 	"Metabolic Acidosis with Anion Gap\n",
 	"Metabolic Acidosis with Anion Gap and Acidosis without Anion Gap\n",
 	"Metabolic Acidosis with Anion Gap and Metabolic Acidosis\n",
-	"Compensated Metabolic Acidosis\n",
-	"Metabolic Alcalosis and Respiratory Acidosis\n",
+	"Compensated Metabolic Alcalosis\n",
+	"Metabolic Acidosis and Respiratory Acidosis\n",
 	"Metabolic Alcalosis and Respiratory Alcalosis\n",
 	"Partially Compensated Respiratory Alcalosis\n",
 	"Compensated Chronic Respiratory Alcalosis\n",
@@ -50,7 +50,7 @@ print "Cl="; $Cl=<>;
 print "Albumine="; $Alb=<>;
 
 $G=$Na-$Cl-$HCO3;
-($Alb<3.5) && $G+=2.5*(4.5-Alb);
+($Alb<3.5) && $G+=2.3*(4.5-Alb);
 
 @I=();
 ($Ph<7 || $Ph>=7.7) && (print "Is it alive?\n") && exit(); 
@@ -100,7 +100,7 @@ sub A_resacidosis() {
 	my $x=(10**(9-$Ph)-10**1.6)/($y-40);
 	if ($x>0.8) {print $r[5];}
 	elsif ($x<0.3) {print $r[6];}
-	else {print $r[5];}
+	else {print $r[4];}
 }
 
 sub A_metacidosis() {
@@ -133,7 +133,7 @@ sub alc3() {
 }
 
 sub alc4() {
-	print $r[3];
+	print $r[12];
 	A_resalcalosis();
 }
 
@@ -151,7 +151,7 @@ sub A_resalcalosis() {
 
 sub A_metalcalosis() {
 	$x=0.7*$HCO3+21-$pCO2;
-	if ($x<-5) {print $r[11];}
+	if ($x<-5) {print $r[3];}
 	elsif ($x>5) {print $r[12];}
 	else {print $r[10];}
 }
